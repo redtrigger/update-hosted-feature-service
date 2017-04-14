@@ -1,6 +1,9 @@
 # Update.py - update hosted feature services by replacing the .SD file
 #   and calling publishing (with overwrite) to update the feature service
 #
+# Modified to optional parameters via a -i switch
+# Local path modified to be a permanent directory
+# Usage Update.py -i <ini File name> (.ini is optional, the script will add it if not found)
 
 import ConfigParser
 import ast
@@ -16,6 +19,7 @@ import gzip
 from io import BytesIO
 import string
 import random
+import getopt
 
 from xml.etree import ElementTree as ET
 import arcpy
@@ -466,6 +470,26 @@ if __name__ == "__main__":
     # start
 
     print("Starting Feature Service publish process")
+    
+    # Use parameter args to get the correct INI file
+    #
+    # Correct Syntax
+    # Update.py -i <iniFile Name>
+    # Can have .ini on the end or not
+    # localPath modified to use permanent location for scripts and INI files
+    
+    opts, args = getopt.getopt(sys.argv[1:], "i:",["inifile="])
+    #localPath = r'O:\GIS\Scripts'
+    localPath = sys.path[0]
+    for opt, arg in opts:
+        if opt in ("-i", "--inifile"):
+            iniFile = arg
+            if iniFile[-4:] != ".ini":
+                iniFile = iniFile + ".ini"
+
+    # Find and gather settings from the ini file
+    #localPath = sys.path[0]
+    settingsFile = os.path.join(localPath, iniFile)
 
     # Find and gather settings from the ini file
     localPath = sys.path[0]
